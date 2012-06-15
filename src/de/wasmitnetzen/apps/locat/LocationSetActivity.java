@@ -6,6 +6,7 @@ import java.util.List;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -81,20 +82,35 @@ public class LocationSetActivity extends MapActivity {
 	}
 
 	class MapOverlay extends com.google.android.maps.Overlay
-	{	
+	{		
+		private boolean   isPinch  =  false;
+
 		@Override
-		public boolean onTouchEvent(MotionEvent event, MapView mapView) 
-		{   
-			//---when user lifts his finger---
-			if (event.getAction() == 1) {
-				mGeoPoint = mapView.getProjection().fromPixels(
-						(int) event.getX(),
-						(int) event.getY());
-				setLocation();				
-				return true;
-			}
-			else                
-				return false;
-		}      
+		public boolean onTap(GeoPoint p, MapView map){
+		    if ( isPinch ){
+		        return false;
+		    }else{		  
+		        if ( p!=null ){
+		        	mGeoPoint = p;
+					setLocation();
+		            return true;            // We handled the tap
+		        }else{
+		            return false;           // Null GeoPoint
+		        }
+		    }
+		}
+
+		@Override
+		public boolean onTouchEvent(MotionEvent e, MapView mapView)
+		{
+		    int fingers = e.getPointerCount();
+		    if( e.getAction()==MotionEvent.ACTION_DOWN ){
+		        isPinch=false;  // Touch DOWN, don't know if it's a pinch yet
+		    }
+		    if( e.getAction()==MotionEvent.ACTION_MOVE && fingers==2 ){
+		        isPinch=true;   // Two fingers, def a pinch
+		    }
+		    return super.onTouchEvent(e,mapView);
+		}
 	}
 }
