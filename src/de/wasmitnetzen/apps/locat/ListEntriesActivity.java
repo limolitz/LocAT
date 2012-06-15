@@ -1,8 +1,10 @@
 package de.wasmitnetzen.apps.locat;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import de.wasmitnetzen.apps.locat.background.LocationCheckListener;
 
 public class ListEntriesActivity extends ListActivity {
 
@@ -20,6 +23,7 @@ public class ListEntriesActivity extends ListActivity {
 
 	private static final int INSERT_ID = Menu.FIRST;
 	private static final int DELETE_ID = Menu.FIRST + 1;
+	private static final int BUTTON_ID = Menu.FIRST + 2;
 
 	private EntriesDbAdapter mDbHelper;
 
@@ -33,6 +37,15 @@ public class ListEntriesActivity extends ListActivity {
 		mDbHelper.open();
 		fillEntryList();
 		registerForContextMenu(getListView());
+		startLocationWatchThread();
+	}
+	
+	private void startLocationWatchThread() {
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+		        10000,          // 10-second interval.
+		        10,             // 10 meters.
+		        new LocationCheckListener());
 	}
 
 	private void fillEntryList() {
@@ -55,6 +68,7 @@ public class ListEntriesActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+		menu.add(0, BUTTON_ID, 0, R.string.pointlessButton);
 		return true;
 	}
 

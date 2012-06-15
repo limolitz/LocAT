@@ -39,6 +39,7 @@ public final class R {
         public static final int menu_delete=0x7f040003;
         public static final int menu_insert=0x7f040002;
         public static final int no_notes=0x7f040001;
+        public static final int pointlessButton=0x7f040009;
         public static final int title=0x7f040004;
     }
 }
